@@ -176,7 +176,7 @@
 
             <!-- Botón para revelar mensaje especial -->
             <button id="revealLoveButton" class="reveal-button">
-                Presiona Aquí, Geraldine...
+                Presiona Aquí...
             </button>
             <!-- Mensaje especial oculto -->
             <div id="specialMessage" class="hidden-message">
@@ -238,6 +238,11 @@
             for (let x = 0; x < matrixColumns; x++) {
                 matrixDrops[x] = 1;
             }
+            // También es buena idea redibujar una vez después del resize
+            // para evitar que quede en blanco momentáneamente si el intervalo es largo
+            if (matrixInterval) clearInterval(matrixInterval);
+            drawMatrix(); // Dibujar una vez inmediatamente
+            matrixInterval = setInterval(drawMatrix, 60);
         });
 
 
@@ -245,7 +250,7 @@
         // Adaptado de la segunda parte de 'love4.html' (originalmente 'pinkboard')
         const heartCanvas = document.getElementById('heart-canvas');
         const heartCtx = heartCanvas.getContext('2d');
-        let heartAnimationTime;
+        // let heartAnimationTime; // No se usa, se puede quitar
 
         const heartSettings = {
             particles: {
@@ -295,8 +300,13 @@
             };
             Point.prototype.normalize = function () {
                 var length = this.length();
-                this.x /= length;
-                this.y /= length;
+                if (length === 0) { // Evitar división por cero
+                    this.x = 0;
+                    this.y = 0;
+                } else {
+                    this.x /= length;
+                    this.y /= length;
+                }
                 return this;
             };
             return Point;
@@ -325,10 +335,14 @@
                 this.age += deltaTime;
             };
             Particle.prototype.draw = function (context, image) {
-                function ease(t) { return --t * t * t + 1; }
-                var size = image.width * ease(this.age / heartSettings.particles.duration);
-                context.globalAlpha = 1 - this.age / heartSettings.particles.duration;
-                context.drawImage(image, this.position.x - size / 2, this.position.y - size / 2, size, size);
+                function ease(t) { return --t * t * t + 1; } // easeOutCubic
+                var sizeFactor = Math.max(0, 1 - (this.age / heartSettings.particles.duration)); // Factor de tamaño basado en la edad
+                var size = image.width * ease(sizeFactor) ; // Aplicar easing al factor de tamaño
+                
+                context.globalAlpha = Math.max(0, 1 - this.age / heartSettings.particles.duration); // Opacidad basada en la edad
+                if (size > 0) { // Solo dibujar si el tamaño es positivo
+                   context.drawImage(image, this.position.x - size / 2, this.position.y - size / 2, size, size);
+                }
             };
             return Particle;
         })();
@@ -344,7 +358,7 @@
                 particles[firstFree].initialize(x, y, dx, dy);
                 firstFree++;
                 if (firstFree == particles.length) firstFree = 0;
-                if (firstActive == firstFree) firstActive++;
+                if (firstActive == firstFree) firstActive++; // Si firstFree alcanza a firstActive, mover firstActive
                 if (firstActive == particles.length) firstActive = 0;
             };
             ParticlePool.prototype.update = function (deltaTime) {
@@ -352,17 +366,18 @@
                 if (firstActive < firstFree) {
                     for (i = firstActive; i < firstFree; i++) particles[i].update(deltaTime);
                 }
-                if (firstFree < firstActive) {
+                if (firstFree < firstActive) { // El buffer ha dado la vuelta
                     for (i = firstActive; i < particles.length; i++) particles[i].update(deltaTime);
                     for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
                 }
+                // Liberar partículas viejas
                 while (particles[firstActive].age >= duration && firstActive != firstFree) {
                     firstActive++;
                     if (firstActive == particles.length) firstActive = 0;
                 }
             };
             ParticlePool.prototype.draw = function (context, image) {
-                var i; // Declarar i aquí para evitar problemas de scope en bucles estrictos
+                var i; 
                 if (firstActive < firstFree) {
                     for (i = firstActive; i < firstFree; i++) particles[i].draw(context, image);
                 }
@@ -376,49 +391,59 @@
 
         // Función principal para la animación del corazón de partículas
         (function (canvas) {
-            var context = canvas.getContext("2d"),
-                particles = new ParticlePool(heartSettings.particles.length),
-                particleRate = heartSettings.particles.length / heartSettings.particles.duration,
-                time;
+            if (!canvas) {
+                console.error("El canvas del corazón no fue encontrado.");
+                return;
+            }
+            var context = canvas.getContext("2d");
+            if (!context) {
+                console.error("No se pudo obtener el contexto 2D para el canvas del corazón.");
+                return;
+            }
 
-            // Función para generar puntos en forma de corazón
+            var particles = new ParticlePool(heartSettings.particles.length);
+            var particleRate = heartSettings.particles.length / heartSettings.particles.duration; // Partículas por segundo
+            var time;
+
             function pointOnHeart(t) {
+                // Ecuación paramétrica para un corazón
                 return new Point(
                     160 * Math.pow(Math.sin(t), 3),
                     130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
                 );
             }
 
-            // Crear la imagen de la partícula (un pequeño corazón)
             var image = (function () {
                 var imgCanvas = document.createElement("canvas"),
                     imgContext = imgCanvas.getContext("2d");
                 imgCanvas.width = heartSettings.particles.size;
                 imgCanvas.height = heartSettings.particles.size;
-                function to(t) {
+                
+                function to(t) { // Escala el punto del corazón al tamaño de la partícula
                     var point = pointOnHeart(t);
                     point.x = heartSettings.particles.size / 2 + (point.x * heartSettings.particles.size) / 350;
                     point.y = heartSettings.particles.size / 2 - (point.y * heartSettings.particles.size) / 350;
                     return point;
                 }
+
                 imgContext.beginPath();
                 var t = -Math.PI;
-                var point = to(t);
-                imgContext.moveTo(point.x, point.y);
+                var currentPoint = to(t);
+                imgContext.moveTo(currentPoint.x, currentPoint.y);
                 while (t < Math.PI) {
-                    t += 0.01;
-                    point = to(t);
-                    imgContext.lineTo(point.x, point.y);
+                    t += 0.01; 
+                    currentPoint = to(t);
+                    imgContext.lineTo(currentPoint.x, currentPoint.y);
                 }
                 imgContext.closePath();
-                imgContext.fillStyle = "#e91e63"; // Color de las partículas de corazón
+                imgContext.fillStyle = "#e91e63"; // Color de las partículas
                 imgContext.fill();
+                
                 var image = new Image();
                 image.src = imgCanvas.toDataURL();
                 return image;
             })();
 
-            // Función de renderizado
             function renderHeart() {
                 requestAnimationFrame(renderHeart);
                 var newTime = new Date().getTime() / 1000,
@@ -427,53 +452,75 @@
 
                 context.clearRect(0, 0, canvas.width, canvas.height);
 
+                // --- INICIO DE MODIFICACIÓN PARA ESCALAR CORAZÓN ---
+                const referenceWidth = 400; // Ancho de referencia para el diseño original del corazón
+                let scaleFactor = canvas.width / referenceWidth; // Escala directa basada en el ancho actual
+                scaleFactor = Math.min(1.0, scaleFactor); // No escalar más allá del 100% (tamaño de referencia)
+                scaleFactor = Math.max(0.5, scaleFactor); // Asegurar una escala mínima (ej. 50% del tamaño de referencia)
+                // --- FIN DE MODIFICACIÓN PARA ESCALAR CORAZÓN ---
+
+
                 var amount = particleRate * deltaTime;
                 for (var i = 0; i < amount; i++) {
-                    var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-                    var dir = pos.clone().length(heartSettings.particles.velocity);
-                    particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
+                    var posUnscaled = pointOnHeart(Math.PI - 2 * Math.PI * Math.random()); // Coordenadas no escaladas
+
+                    // Aplicar factor de escala a las coordenadas y la velocidad
+                    var scaledX = posUnscaled.x * scaleFactor;
+                    var scaledY = posUnscaled.y * scaleFactor; // Esto escala la forma y el offset Y proporcionalmente
+
+                    var dir = posUnscaled.clone().normalize().length(heartSettings.particles.velocity);
+                    var scaledDirX = dir.x * scaleFactor; // Escalar también la velocidad de las partículas
+                    var scaledDirY = dir.y * scaleFactor;
+
+                    particles.add(
+                        canvas.width / 2 + scaledX,
+                        canvas.height / 2 - scaledY, // Y se invierte para las coordenadas del canvas
+                        scaledDirX,
+                        -scaledDirY // La velocidad Y también se invierte
+                    );
                 }
                 particles.update(deltaTime);
                 particles.draw(context, image);
             }
 
-            // Ajustar tamaño del canvas del corazón al cambiar tamaño de ventana
             function onResizeHeart() {
                 const container = document.getElementById('heart-canvas-container');
-                canvas.width = container.clientWidth;
-                canvas.height = container.clientHeight;
+                if (container) {
+                    canvas.width = container.clientWidth;
+                    canvas.height = container.clientHeight;
+                } else {
+                     canvas.width = Math.min(window.innerWidth * 0.8, 500); // Fallback
+                     canvas.height = 450; // Fallback
+                }
             }
             window.addEventListener('resize', onResizeHeart);
             
-            // Iniciar después de un breve retraso para asegurar que todo esté cargado
             setTimeout(function () {
-                onResizeHeart(); // Ajustar tamaño inicial
+                onResizeHeart(); 
                 renderHeart();
             }, 100);
         })(heartCanvas);
 
 
         // --- Script para el efecto de tecleo (Typewriter) ---
-        // Adaptado de 'love.html'
         (function ($) {
             $.fn.typewriter = function () {
                 this.each(function () {
                     var d = $(this), c = d.html(), b = 0;
-                    d.html(''); // Limpiar contenido inicial
+                    d.html(''); 
                     var e = setInterval(function () {
                         var f = c.substr(b, 1);
-                        if (f == '<') { // Si es una etiqueta HTML, avanzar hasta el final de la etiqueta
+                        if (f == '<') { 
                             b = c.indexOf('>', b) + 1;
                         } else {
                             b++;
                         }
-                        // Mostrar el cursor parpadeante
                         d.html(c.substring(0, b) + (b & 1 ? '_' : ''));
                         if (b >= c.length) {
                             clearInterval(e);
-                            d.html(c.substring(0, b)); // Mostrar texto final sin cursor
+                            d.html(c.substring(0, b)); 
                         }
-                    }, 100); // Velocidad de tecleo
+                    }, 100); 
                 });
                 return this;
             };
@@ -506,17 +553,26 @@
 <span class="comments">// console.log(miAmorPorTi.declaracion());</span>
 <span class="comments">// console.log(nuestroFuturo("siempre"));</span>
             `;
-            // Aplicar el efecto de tecleo
-            // Esperar un poco para que se vea más natural después de la carga
+            
             setTimeout(function() {
-                $('#typed-code-container').html(codeContent).typewriter();
+                if ($('#typed-code-container').length) {
+                     $('#typed-code-container').html(codeContent).typewriter();
+                } else {
+                    console.error("El contenedor del código tecleado #typed-code-container no fue encontrado.");
+                }
             }, 1500);
 
 
             // --- Interacción del botón para revelar mensaje ---
-            $('#revealLoveButton').on('click', function() {
-                $('#specialMessage').slideDown(1000); // Animación de despliegue más lenta
-                $(this).fadeOut(500); // El botón desaparece
+            // Se usa .click() que es más compatible con jQuery 1.4.2 para bindings directos
+            $('#revealLoveButton').click(function() {
+                const specialMessage = $('#specialMessage');
+                if (specialMessage.length) {
+                    specialMessage.slideDown(1000); 
+                    $(this).fadeOut(500); 
+                } else {
+                    console.error("El elemento del mensaje especial #specialMessage no fue encontrado.");
+                }
             });
         });
 
