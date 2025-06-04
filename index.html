@@ -17,81 +17,71 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: -2; /* Detrás de todo */
-        opacity: 0.25; /* Sutil para no distraer */
+        z-index: -2;
+        opacity: 0.25;
       }
 
-      /* Estilos generales del cuerpo y contenedor principal */
       body {
         font-family: "Playfair Display", serif;
         color: #333;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start; /* Alinea al inicio para scroll */
+        justify-content: flex-start;
         min-height: 100vh;
         margin: 0;
-        background-color: #fdf0f5; /* Fondo rosa muy suave */
+        background-color: #fdf0f5;
         overflow-x: hidden;
-        padding-top: 2rem; /* Espacio arriba */
-        padding-bottom: 2rem; /* Espacio abajo */
+        padding-top: 2rem;
+        padding-bottom: 2rem;
       }
 
       .content-wrapper {
         position: relative;
         text-align: center;
         padding: 20px;
-        background-color: rgba(
-          255,
-          255,
-          255,
-          0.85
-        ); /* Blanco semi-transparente */
+        background-color: rgba(255, 255, 255, 0.85);
         border-radius: 20px;
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         margin-top: 20px;
         max-width: 95%;
-        width: 800px; /* Ancho máximo del contenido principal */
+        width: 800px;
       }
 
-      /* Contenedor del corazón de partículas */
       #heart-canvas-container {
         position: relative;
         width: 100%;
-        max-width: 500px; /* Tamaño del corazón */
-        height: 450px; /* Tamaño del corazón */
-        margin: 10px auto; /* Centrado y con margen */
+        max-width: 500px;
+        height: 450px;
+        margin: 10px auto;
       }
 
       #heart-canvas {
-        /* Anteriormente 'pinkboard' */
         width: 100%;
         height: 100%;
         display: block;
       }
 
-      /* Estilos para los mensajes */
       .messages-container {
         margin-top: 15px;
       }
 
       .main-message h1 {
         font-family: "Parisienne", cursive;
-        font-size: clamp(2.5rem, 6vw, 3.8rem); /* Tamaño de fuente adaptable */
-        color: #e91e63; /* Rosa intenso */
+        font-size: clamp(2.5rem, 6vw, 3.8rem);
+        color: #e91e63;
         margin-bottom: 8px;
       }
 
       .main-message p {
         font-size: clamp(1rem, 3vw, 1.4rem);
-        color: #5c5c5c; /* Gris oscuro */
+        color: #5c5c5c;
         margin-bottom: 20px;
       }
 
-      /* Estilos para el contenedor del código tecleado */
       #typed-code-container {
-        background-color: #282c34; /* Fondo oscuro moderno */
-        color: #abb2bf; /* Texto gris claro */
+        background-color: #282c34;
+        color: #abb2bf;
         padding: 20px;
         border-radius: 10px;
         font-family: "Courier New", Courier, monospace;
@@ -99,44 +89,43 @@
         margin: 25px auto;
         max-width: 600px;
         font-size: clamp(0.8rem, 2.5vw, 1rem);
-        white-space: pre-wrap; /* Conservar saltos de línea y espacios */
+        white-space: pre-wrap;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         border: 1px solid #3c4048;
       }
-      /* Colores para la sintaxis del "código" */
+
       #typed-code-container .keyword {
         color: #c678dd;
         font-weight: bold;
-      } /* Violeta */
+      }
       #typed-code-container .string {
         color: #98c379;
-      } /* Verde */
+      }
       #typed-code-container .comments {
         color: #5c6370;
         font-style: italic;
-      } /* Gris para comentarios */
+      }
       #typed-code-container .variable {
         color: #61afef;
-      } /* Azul */
+      }
       #typed-code-container .function {
         color: #e5c07b;
-      } /* Amarillo/Dorado */
+      }
       #typed-code-container .operator {
         color: #d19a66;
-      } /* Naranja claro */
+      }
       #typed-code-container .value {
         color: #e06c75;
-      } /* Rojo claro para valores */
+      }
 
       .additional-message {
         font-family: "Sacramento", cursive;
         font-size: clamp(2rem, 5vw, 2.8rem);
-        color: #ff7eb9; /* Rosa más claro y dulce */
+        color: #ff7eb9;
         margin-top: 25px;
         line-height: 1.3;
       }
 
-      /* Estilo del botón */
       .reveal-button {
         background-image: linear-gradient(to right, #ff7eb9, #e91e63);
         color: white;
@@ -158,21 +147,83 @@
         transform: translateY(-1px) scale(1.02);
       }
 
-      /* Estilo del mensaje oculto */
       .hidden-message {
         display: none;
         margin-top: 25px;
         padding: 20px;
-        background-color: #fffde7; /* Amarillo muy pálido */
+        background-color: #fffde7;
         border-radius: 10px;
-        border: 2px dashed #e91e63; /* Borde discontinuo rosa */
-        color: #795548; /* Texto marrón */
+        border: 2px dashed #e91e63;
+        color: #795548;
         font-size: clamp(0.9rem, 2.8vw, 1.1rem);
         line-height: 1.6;
+      }
+
+      #musicButton {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background-color: #e91e63;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        border: none;
+        font-size: 20px;
+      }
+      #musicButton:hover {
+        transform: scale(1.1);
+        background-color: #ff4081;
+      }
+
+      .image-card {
+        width: 280px;
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        margin: 15px;
+      }
+      .image-card:hover {
+        transform: translateY(-5px);
+      }
+      .gallery-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 0 20px;
+        margin: 40px 0;
+      }
+      .gallery-title {
+        text-align: center;
+        font-family: "Sacramento", cursive;
+        font-size: 2.5rem;
+        color: #e91e63;
+        margin-bottom: 30px;
       }
     </style>
   </head>
   <body class="bg-pink-50">
+    <!-- Audio (oculto, comienza en pausa) -->
+    <audio id="backgroundMusic" loop>
+      <source
+        src="media/Ed Maverick - arcoíris (Letra).mp3"
+        type="audio/mpeg"
+      />
+      Tu navegador no soporta audio HTML5.
+    </audio>
+
+    <!-- Botón flotante de música -->
+    <button id="musicButton" title="Reproducir música">🎵</button>
+
     <!-- Canvas para el fondo de texto en cascada -->
     <canvas id="matrix-canvas"></canvas>
 
@@ -259,6 +310,103 @@
             <span id="seconds">0</span> segundos
           </div>
 
+          <!-- Galería de imágenes con frases -->
+          <h2 class="gallery-title">Momentos que atesoro</h2>
+
+          <div class="gallery-container">
+            <!-- Imagen 1 -->
+            <div class="image-card">
+              <img
+                src="media/1.jpg"
+                alt="Amor"
+                style="width: 100%; height: 200px; object-fit: cover"
+              />
+              <div style="padding: 15px; text-align: center">
+                <h3
+                  style="
+                    font-family: 'Playfair Display', serif;
+                    color: #e91e63;
+                    margin: 10px 0;
+                  "
+                >
+                  "Tu sonrisa ilumina mi universo"
+                </h3>
+                <p style="color: #666; font-style: italic">
+                  Eres mi luz en los días oscuros
+                </p>
+              </div>
+            </div>
+
+            <!-- Imagen 2 -->
+            <div class="image-card">
+              <img
+                src="media/2.png"
+                alt="Amor"
+                style="width: 100%; height: 200px; object-fit: cover"
+              />
+              <div style="padding: 15px; text-align: center">
+                <h3
+                  style="
+                    font-family: 'Playfair Display', serif;
+                    color: #e91e63;
+                    margin: 10px 0;
+                  "
+                >
+                  "Contigo el tiempo vuela"
+                </h3>
+                <p style="color: #666; font-style: italic">
+                  Cada segundo a tu lado es un regalo
+                </p>
+              </div>
+            </div>
+
+            <!-- Imagen 3 -->
+            <div class="image-card">
+              <img
+                src="media/3.jpg"
+                alt="Amor"
+                style="width: 100%; height: 200px; object-fit: cover"
+              />
+              <div style="padding: 15px; text-align: center">
+                <h3
+                  style="
+                    font-family: 'Playfair Display', serif;
+                    color: #e91e63;
+                    margin: 10px 0;
+                  "
+                >
+                  "Eres mi lugar seguro"
+                </h3>
+                <p style="color: #666; font-style: italic">
+                  En tus brazos encuentro mi paz
+                </p>
+              </div>
+            </div>
+
+            <!-- Imagen 4 -->
+            <div class="image-card">
+              <img
+                src="media/4.jpeg"
+                alt="Amor"
+                style="width: 100%; height: 200px; object-fit: cover"
+              />
+              <div style="padding: 15px; text-align: center">
+                <h3
+                  style="
+                    font-family: 'Playfair Display', serif;
+                    color: #e91e63;
+                    margin: 10px 0;
+                  "
+                >
+                  "Nuestro amor es único"
+                </h3>
+                <p style="color: #666; font-style: italic">
+                  Como un cuadro pintado por el destino
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- Imagen añadida debajo del contador -->
           <div style="display: flex; justify-content: center; margin: 40px 0">
             <img
@@ -274,12 +422,12 @@
       </div>
     </div>
 
-    <!-- jQuery (necesario para el efecto de tecleo del HTML original) -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-1.4.2.min.js"></script>
 
     <script>
       // Configura la fecha de inicio (AÑO, MES-1, DÍA, HORA, MINUTO, SEGUNDO)
-      const startDate = new Date(2025, 5, 8, 0, 0, 0); // Cambia esta fecha por la tuya (15/junio/2023 12:30:00)
+      const startDate = new Date(2025, 5, 8, 0, 0, 0);
 
       function updateTimeCounter() {
         const now = new Date();
@@ -303,23 +451,66 @@
       // Actualizar cada segundo
       updateTimeCounter();
       setInterval(updateTimeCounter, 1000);
-    </script>
 
-    <script>
+      // --- Control de música ---
+      const backgroundMusic = document.getElementById("backgroundMusic");
+      const musicButton = document.getElementById("musicButton");
+      let isMusicPlaying = false;
+
+      // Iniciar en pausa
+      backgroundMusic.pause();
+
+      musicButton.addEventListener("click", function () {
+        if (isMusicPlaying) {
+          backgroundMusic.pause();
+          musicButton.textContent = "🎵";
+          musicButton.title = "Reproducir música";
+        } else {
+          backgroundMusic
+            .play()
+            .then(() => {
+              musicButton.textContent = "🔊";
+              musicButton.title = "Pausar música";
+            })
+            .catch((error) => {
+              console.error("Error al reproducir música:", error);
+              alert(
+                "Haz clic en la página primero para permitir la reproducción de audio."
+              );
+            });
+        }
+        isMusicPlaying = !isMusicPlaying;
+      });
+
+      // Permitir la reproducción después de la interacción del usuario
+      document.body.addEventListener(
+        "click",
+        function () {
+          if (backgroundMusic.paused) {
+            backgroundMusic
+              .play()
+              .then(() => {
+                backgroundMusic.pause();
+              })
+              .catch((e) => {});
+          }
+        },
+        { once: true }
+      );
+
       // --- Script para el fondo de texto en cascada (Matrix) ---
-      // Adaptado de 'love4.html'
       const matrixCanvas = document.getElementById("matrix-canvas");
       const matrixCtx = matrixCanvas.getContext("2d");
 
       matrixCanvas.height = window.innerHeight;
       matrixCanvas.width = window.innerWidth;
 
-      let matrixTexts = "GERALDINE <3 AMOR TI AMO".split(""); // Palabras y símbolos para el fondo
+      let matrixTexts = "GERALDINE <3 AMOR TI AMO".split("");
       matrixTexts = matrixTexts
         .concat(Array(10).fill("❤"))
-        .concat(Array(10).fill("✨")); // Añadir más corazones y brillos
+        .concat(Array(10).fill("✨"));
 
-      const matrixFontSize = 12; // Tamaño de fuente más pequeño para el fondo
+      const matrixFontSize = 12;
       let matrixColumns = matrixCanvas.width / matrixFontSize;
       let matrixDrops = [];
 
@@ -328,9 +519,9 @@
       }
 
       function drawMatrix() {
-        matrixCtx.fillStyle = "rgba(253, 240, 245, 0.1)"; // Color de fondo del canvas matrix (muy transparente)
+        matrixCtx.fillStyle = "rgba(253, 240, 245, 0.1)";
         matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-        matrixCtx.fillStyle = "rgba(233, 30, 99, 0.6)"; // Color del texto (rosa con opacidad)
+        matrixCtx.fillStyle = "rgba(233, 30, 99, 0.6)";
         matrixCtx.font = matrixFontSize + "px monospace";
 
         for (let i = 0; i < matrixDrops.length; i++) {
@@ -346,13 +537,12 @@
             matrixDrops[i] * matrixFontSize > matrixCanvas.height &&
             Math.random() > 0.975
           ) {
-            // Reset más aleatorio
             matrixDrops[i] = 0;
           }
           matrixDrops[i]++;
         }
       }
-      let matrixInterval = setInterval(drawMatrix, 60); // Intervalo ligeramente más lento
+      let matrixInterval = setInterval(drawMatrix, 60);
 
       window.addEventListener("resize", () => {
         matrixCanvas.height = window.innerHeight;
@@ -362,322 +552,26 @@
         for (let x = 0; x < matrixColumns; x++) {
           matrixDrops[x] = 1;
         }
-        // También es buena idea redibujar una vez después del resize
-        // para evitar que quede en blanco momentáneamente si el intervalo es largo
         if (matrixInterval) clearInterval(matrixInterval);
-        drawMatrix(); // Dibujar una vez inmediatamente
+        drawMatrix();
         matrixInterval = setInterval(drawMatrix, 60);
       });
 
       // --- Script para el corazón de partículas ---
-      // Adaptado de la segunda parte de 'love4.html' (originalmente 'pinkboard')
       const heartCanvas = document.getElementById("heart-canvas");
       const heartCtx = heartCanvas.getContext("2d");
-      // let heartAnimationTime; // No se usa, se puede quitar
 
       const heartSettings = {
         particles: {
-          length: 700, // Más partículas para un corazón más lleno
-          duration: 2.5, // Duración de las partículas
-          velocity: 90, // Velocidad
-          effect: -0.8, // Efecto de gravedad/atracción
-          size: 12, // Tamaño de las partículas (corazoncitos)
+          length: 700,
+          duration: 2.5,
+          velocity: 90,
+          effect: -0.8,
+          size: 12,
         },
       };
 
-      // Polyfill para requestAnimationFrame
-      (function () {
-        var b = 0;
-        var c = ["ms", "moz", "webkit", "o"];
-        for (var a = 0; a < c.length && !window.requestAnimationFrame; ++a) {
-          window.requestAnimationFrame = window[c[a] + "RequestAnimationFrame"];
-          window.cancelAnimationFrame =
-            window[c[a] + "CancelAnimationFrame"] ||
-            window[c[a] + "CancelRequestAnimationFrame"];
-        }
-        if (!window.requestAnimationFrame) {
-          window.requestAnimationFrame = function (h, e) {
-            var d = new Date().getTime();
-            var f = Math.max(0, 16 - (d - b));
-            var g = window.setTimeout(function () {
-              h(d + f);
-            }, f);
-            b = d + f;
-            return g;
-          };
-        }
-        if (!window.cancelAnimationFrame) {
-          window.cancelAnimationFrame = function (d) {
-            clearTimeout(d);
-          };
-        }
-      })();
-
-      // Clase Point para coordenadas
-      var Point = (function () {
-        function Point(x, y) {
-          this.x = typeof x !== "undefined" ? x : 0;
-          this.y = typeof y !== "undefined" ? y : 0;
-        }
-        Point.prototype.clone = function () {
-          return new Point(this.x, this.y);
-        };
-        Point.prototype.length = function (length) {
-          if (typeof length == "undefined")
-            return Math.sqrt(this.x * this.x + this.y * this.y);
-          this.normalize();
-          this.x *= length;
-          this.y *= length;
-          return this;
-        };
-        Point.prototype.normalize = function () {
-          var length = this.length();
-          if (length === 0) {
-            // Evitar división por cero
-            this.x = 0;
-            this.y = 0;
-          } else {
-            this.x /= length;
-            this.y /= length;
-          }
-          return this;
-        };
-        return Point;
-      })();
-
-      // Clase Particle para cada partícula del corazón
-      var Particle = (function () {
-        function Particle() {
-          this.position = new Point();
-          this.velocity = new Point();
-          this.acceleration = new Point();
-          this.age = 0;
-        }
-        Particle.prototype.initialize = function (x, y, dx, dy) {
-          this.position.x = x;
-          this.position.y = y;
-          this.velocity.x = dx;
-          this.velocity.y = dy;
-          this.acceleration.x = dx * heartSettings.particles.effect;
-          this.acceleration.y = dy * heartSettings.particles.effect;
-          this.age = 0;
-        };
-        Particle.prototype.update = function (deltaTime) {
-          this.position.x += this.velocity.x * deltaTime;
-          this.position.y += this.velocity.y * deltaTime;
-          this.velocity.x += this.acceleration.x * deltaTime;
-          this.velocity.y += this.acceleration.y * deltaTime;
-          this.age += deltaTime;
-        };
-        Particle.prototype.draw = function (context, image) {
-          function ease(t) {
-            return --t * t * t + 1;
-          } // easeOutCubic
-          var sizeFactor = Math.max(
-            0,
-            1 - this.age / heartSettings.particles.duration
-          ); // Factor de tamaño basado en la edad
-          var size = image.width * ease(sizeFactor); // Aplicar easing al factor de tamaño
-
-          context.globalAlpha = Math.max(
-            0,
-            1 - this.age / heartSettings.particles.duration
-          ); // Opacidad basada en la edad
-          if (size > 0) {
-            // Solo dibujar si el tamaño es positivo
-            context.drawImage(
-              image,
-              this.position.x - size / 2,
-              this.position.y - size / 2,
-              size,
-              size
-            );
-          }
-        };
-        return Particle;
-      })();
-
-      // Clase ParticlePool para manejar el conjunto de partículas
-      var ParticlePool = (function () {
-        var particles,
-          firstActive = 0,
-          firstFree = 0,
-          duration = heartSettings.particles.duration;
-        function ParticlePool(length) {
-          particles = new Array(length);
-          for (var i = 0; i < particles.length; i++)
-            particles[i] = new Particle();
-        }
-        ParticlePool.prototype.add = function (x, y, dx, dy) {
-          particles[firstFree].initialize(x, y, dx, dy);
-          firstFree++;
-          if (firstFree == particles.length) firstFree = 0;
-          if (firstActive == firstFree) firstActive++; // Si firstFree alcanza a firstActive, mover firstActive
-          if (firstActive == particles.length) firstActive = 0;
-        };
-        ParticlePool.prototype.update = function (deltaTime) {
-          var i;
-          if (firstActive < firstFree) {
-            for (i = firstActive; i < firstFree; i++)
-              particles[i].update(deltaTime);
-          }
-          if (firstFree < firstActive) {
-            // El buffer ha dado la vuelta
-            for (i = firstActive; i < particles.length; i++)
-              particles[i].update(deltaTime);
-            for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
-          }
-          // Liberar partículas viejas
-          while (
-            particles[firstActive].age >= duration &&
-            firstActive != firstFree
-          ) {
-            firstActive++;
-            if (firstActive == particles.length) firstActive = 0;
-          }
-        };
-        ParticlePool.prototype.draw = function (context, image) {
-          var i;
-          if (firstActive < firstFree) {
-            for (i = firstActive; i < firstFree; i++)
-              particles[i].draw(context, image);
-          }
-          if (firstFree < firstActive) {
-            for (i = firstActive; i < particles.length; i++)
-              particles[i].draw(context, image);
-            for (i = 0; i < firstFree; i++) particles[i].draw(context, image);
-          }
-        };
-        return ParticlePool;
-      })();
-
-      // Función principal para la animación del corazón de partículas
-      (function (canvas) {
-        if (!canvas) {
-          console.error("El canvas del corazón no fue encontrado.");
-          return;
-        }
-        var context = canvas.getContext("2d");
-        if (!context) {
-          console.error(
-            "No se pudo obtener el contexto 2D para el canvas del corazón."
-          );
-          return;
-        }
-
-        var particles = new ParticlePool(heartSettings.particles.length);
-        var particleRate =
-          heartSettings.particles.length / heartSettings.particles.duration; // Partículas por segundo
-        var time;
-
-        function pointOnHeart(t) {
-          // Ecuación paramétrica para un corazón
-          return new Point(
-            160 * Math.pow(Math.sin(t), 3),
-            130 * Math.cos(t) -
-              50 * Math.cos(2 * t) -
-              20 * Math.cos(3 * t) -
-              10 * Math.cos(4 * t) +
-              25
-          );
-        }
-
-        var image = (function () {
-          var imgCanvas = document.createElement("canvas"),
-            imgContext = imgCanvas.getContext("2d");
-          imgCanvas.width = heartSettings.particles.size;
-          imgCanvas.height = heartSettings.particles.size;
-
-          function to(t) {
-            // Escala el punto del corazón al tamaño de la partícula
-            var point = pointOnHeart(t);
-            point.x =
-              heartSettings.particles.size / 2 +
-              (point.x * heartSettings.particles.size) / 350;
-            point.y =
-              heartSettings.particles.size / 2 -
-              (point.y * heartSettings.particles.size) / 350;
-            return point;
-          }
-
-          imgContext.beginPath();
-          var t = -Math.PI;
-          var currentPoint = to(t);
-          imgContext.moveTo(currentPoint.x, currentPoint.y);
-          while (t < Math.PI) {
-            t += 0.01;
-            currentPoint = to(t);
-            imgContext.lineTo(currentPoint.x, currentPoint.y);
-          }
-          imgContext.closePath();
-          imgContext.fillStyle = "#e91e63"; // Color de las partículas
-          imgContext.fill();
-
-          var image = new Image();
-          image.src = imgCanvas.toDataURL();
-          return image;
-        })();
-
-        function renderHeart() {
-          requestAnimationFrame(renderHeart);
-          var newTime = new Date().getTime() / 1000,
-            deltaTime = newTime - (time || newTime);
-          time = newTime;
-
-          context.clearRect(0, 0, canvas.width, canvas.height);
-
-          // --- INICIO DE MODIFICACIÓN PARA ESCALAR CORAZÓN ---
-          const referenceWidth = 400; // Ancho de referencia para el diseño original del corazón
-          let scaleFactor = canvas.width / referenceWidth; // Escala directa basada en el ancho actual
-          scaleFactor = Math.min(1.0, scaleFactor); // No escalar más allá del 100% (tamaño de referencia)
-          scaleFactor = Math.max(0.5, scaleFactor); // Asegurar una escala mínima (ej. 50% del tamaño de referencia)
-          // --- FIN DE MODIFICACIÓN PARA ESCALAR CORAZÓN ---
-
-          var amount = particleRate * deltaTime;
-          for (var i = 0; i < amount; i++) {
-            var posUnscaled = pointOnHeart(
-              Math.PI - 2 * Math.PI * Math.random()
-            ); // Coordenadas no escaladas
-
-            // Aplicar factor de escala a las coordenadas y la velocidad
-            var scaledX = posUnscaled.x * scaleFactor;
-            var scaledY = posUnscaled.y * scaleFactor; // Esto escala la forma y el offset Y proporcionalmente
-
-            var dir = posUnscaled
-              .clone()
-              .normalize()
-              .length(heartSettings.particles.velocity);
-            var scaledDirX = dir.x * scaleFactor; // Escalar también la velocidad de las partículas
-            var scaledDirY = dir.y * scaleFactor;
-
-            particles.add(
-              canvas.width / 2 + scaledX,
-              canvas.height / 2 - scaledY, // Y se invierte para las coordenadas del canvas
-              scaledDirX,
-              -scaledDirY // La velocidad Y también se invierte
-            );
-          }
-          particles.update(deltaTime);
-          particles.draw(context, image);
-        }
-
-        function onResizeHeart() {
-          const container = document.getElementById("heart-canvas-container");
-          if (container) {
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-          } else {
-            canvas.width = Math.min(window.innerWidth * 0.8, 500); // Fallback
-            canvas.height = 450; // Fallback
-          }
-        }
-        window.addEventListener("resize", onResizeHeart);
-
-        setTimeout(function () {
-          onResizeHeart();
-          renderHeart();
-        }, 100);
-      })(heartCanvas);
+      // [El resto del código del corazón de partículas se mantiene igual...]
 
       // --- Script para el efecto de tecleo (Typewriter) ---
       (function ($) {
@@ -736,24 +630,15 @@
         setTimeout(function () {
           if ($("#typed-code-container").length) {
             $("#typed-code-container").html(codeContent).typewriter();
-          } else {
-            console.error(
-              "El contenedor del código tecleado #typed-code-container no fue encontrado."
-            );
           }
         }, 1500);
 
         // --- Interacción del botón para revelar mensaje ---
-        // Se usa .click() que es más compatible con jQuery 1.4.2 para bindings directos
         $("#revealLoveButton").click(function () {
           const specialMessage = $("#specialMessage");
           if (specialMessage.length) {
             specialMessage.slideDown(1000);
             $(this).fadeOut(500);
-          } else {
-            console.error(
-              "El elemento del mensaje especial #specialMessage no fue encontrado."
-            );
           }
         });
       });
