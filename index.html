@@ -51,7 +51,7 @@
       #heart-canvas-container {
         position: relative;
         width: 100%;
-        max-width: 500px;
+        max-width: 500px; /* Este es el ancho de referencia para el corazón */
         height: 450px;
         margin: 10px auto;
       }
@@ -138,6 +138,7 @@
         transition: all 0.3s ease;
         box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
         margin-top: 20px;
+        /* display: none;  El botón se oculta inicialmente con JS */
       }
       .reveal-button:hover {
         transform: translateY(-3px) scale(1.05);
@@ -427,13 +428,21 @@
 
     <script>
       // Configura la fecha de inicio (AÑO, MES-1, DÍA, HORA, MINUTO, SEGUNDO)
-      const startDate = new Date(2025, 5, 8, 0, 0, 0);
+      const startDate = new Date(2025, 5, 8, 0, 0, 0); // Junio es mes 5 (0-indexado)
 
       function updateTimeCounter() {
         const now = new Date();
         const diff = now - startDate;
 
-        // Cálculos
+        if (diff < 0) {
+          // Si la fecha de inicio es en el futuro
+          document.getElementById("days").textContent = 0;
+          document.getElementById("hours").textContent = 0;
+          document.getElementById("minutes").textContent = 0;
+          document.getElementById("seconds").textContent = 0;
+          return;
+        }
+
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor(
           (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
@@ -441,89 +450,78 @@
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        // Actualizar el DOM
         document.getElementById("days").textContent = days;
         document.getElementById("hours").textContent = hours;
         document.getElementById("minutes").textContent = minutes;
         document.getElementById("seconds").textContent = seconds;
       }
 
-      // Actualizar cada segundo
       updateTimeCounter();
       setInterval(updateTimeCounter, 1000);
 
-      // --- Control de música ---
       const backgroundMusic = document.getElementById("backgroundMusic");
       const musicButton = document.getElementById("musicButton");
       let isMusicPlaying = false;
 
-      // Iniciar en pausa
-      backgroundMusic.pause();
-
-      musicButton.addEventListener("click", function () {
-        if (isMusicPlaying) {
-          backgroundMusic.pause();
-          musicButton.textContent = "🎵";
-          musicButton.title = "Reproducir música";
-        } else {
-          backgroundMusic
-            .play()
-            .then(() => {
-              musicButton.textContent = "🔊";
-              musicButton.title = "Pausar música";
-            })
-            .catch((error) => {
-              console.error("Error al reproducir música:", error);
-              alert(
-                "Haz clic en la página primero para permitir la reproducción de audio."
-              );
-            });
-        }
-        isMusicPlaying = !isMusicPlaying;
-      });
-
-      // Permitir la reproducción después de la interacción del usuario
-      document.body.addEventListener(
-        "click",
-        function () {
-          if (backgroundMusic.paused) {
+      if (backgroundMusic && musicButton) {
+        backgroundMusic.pause();
+        musicButton.addEventListener("click", function () {
+          if (isMusicPlaying) {
+            backgroundMusic.pause();
+            musicButton.textContent = "🎵";
+            musicButton.title = "Reproducir música";
+          } else {
             backgroundMusic
               .play()
               .then(() => {
-                backgroundMusic.pause();
+                musicButton.textContent = "🔊";
+                musicButton.title = "Pausar música";
               })
-              .catch((e) => {});
+              .catch((error) => {
+                console.error("Error al reproducir música:", error);
+                // No mostrar alert, solo loguear o manejar sutilmente
+              });
           }
-        },
-        { once: true }
-      );
+          isMusicPlaying = !isMusicPlaying;
+        });
 
-      // --- Script para el fondo de texto en cascada (Matrix) ---
+        document.body.addEventListener(
+          "click",
+          function enableAudio() {
+            // Darle un nombre a la función para removerla si es necesario
+            if (backgroundMusic.paused && !isMusicPlaying) {
+              // Solo intentar si está pausada y no se supone que esté sonando
+              backgroundMusic
+                .play()
+                .then(() => {
+                  backgroundMusic.pause();
+                }) // Intenta y pausa para "desbloquear"
+                .catch((e) => {});
+            }
+          },
+          { once: true }
+        );
+      }
+
       const matrixCanvas = document.getElementById("matrix-canvas");
       const matrixCtx = matrixCanvas.getContext("2d");
 
       matrixCanvas.height = window.innerHeight;
       matrixCanvas.width = window.innerWidth;
-
       let matrixTexts = "GERALDINE <3 AMOR TI AMO".split("");
       matrixTexts = matrixTexts
         .concat(Array(10).fill("❤"))
         .concat(Array(10).fill("✨"));
-
       const matrixFontSize = 12;
       let matrixColumns = matrixCanvas.width / matrixFontSize;
       let matrixDrops = [];
-
-      for (let x = 0; x < matrixColumns; x++) {
-        matrixDrops[x] = 1;
-      }
+      for (let x = 0; x < matrixColumns; x++) matrixDrops[x] = 1;
 
       function drawMatrix() {
         matrixCtx.fillStyle = "rgba(253, 240, 245, 0.1)";
         matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
         matrixCtx.fillStyle = "rgba(233, 30, 99, 0.6)";
         matrixCtx.font = matrixFontSize + "px monospace";
-
         for (let i = 0; i < matrixDrops.length; i++) {
           const text =
             matrixTexts[Math.floor(Math.random() * matrixTexts.length)];
@@ -532,13 +530,11 @@
             i * matrixFontSize,
             matrixDrops[i] * matrixFontSize
           );
-
           if (
             matrixDrops[i] * matrixFontSize > matrixCanvas.height &&
             Math.random() > 0.975
-          ) {
+          )
             matrixDrops[i] = 0;
-          }
           matrixDrops[i]++;
         }
       }
@@ -549,9 +545,7 @@
         matrixCanvas.width = window.innerWidth;
         matrixColumns = matrixCanvas.width / matrixFontSize;
         matrixDrops = [];
-        for (let x = 0; x < matrixColumns; x++) {
-          matrixDrops[x] = 1;
-        }
+        for (let x = 0; x < matrixColumns; x++) matrixDrops[x] = 1;
         if (matrixInterval) clearInterval(matrixInterval);
         drawMatrix();
         matrixInterval = setInterval(drawMatrix, 60);
@@ -571,16 +565,296 @@
         },
       };
 
-      // [El resto del código del corazón de partículas se mantiene igual...]
+      (function () {
+        var b = 0,
+          c = ["ms", "moz", "webkit", "o"];
+        for (var a = 0; a < c.length && !window.requestAnimationFrame; ++a) {
+          window.requestAnimationFrame = window[c[a] + "RequestAnimationFrame"];
+          window.cancelAnimationFrame =
+            window[c[a] + "CancelAnimationFrame"] ||
+            window[c[a] + "CancelRequestAnimationFrame"];
+        }
+        if (!window.requestAnimationFrame)
+          window.requestAnimationFrame = function (h, e) {
+            var d = new Date().getTime(),
+              f = Math.max(0, 16 - (d - b)),
+              g = window.setTimeout(function () {
+                h(d + f);
+              }, f);
+            b = d + f;
+            return g;
+          };
+        if (!window.cancelAnimationFrame)
+          window.cancelAnimationFrame = function (d) {
+            clearTimeout(d);
+          };
+      })();
+
+      var Point = (function () {
+        function Point(x, y) {
+          this.x = x || 0;
+          this.y = y || 0;
+        }
+        Point.prototype.clone = function () {
+          return new Point(this.x, this.y);
+        };
+        Point.prototype.length = function (length) {
+          if (typeof length == "undefined")
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+          this.normalize();
+          this.x *= length;
+          this.y *= length;
+          return this;
+        };
+        Point.prototype.normalize = function () {
+          var length = this.length();
+          if (length === 0) {
+            this.x = 0;
+            this.y = 0;
+          } else {
+            this.x /= length;
+            this.y /= length;
+          }
+          return this;
+        };
+        return Point;
+      })();
+
+      var Particle = (function () {
+        function Particle() {
+          this.position = new Point();
+          this.velocity = new Point();
+          this.acceleration = new Point();
+          this.age = 0;
+        }
+        Particle.prototype.initialize = function (x, y, dx, dy) {
+          this.position.x = x;
+          this.position.y = y;
+          this.velocity.x = dx;
+          this.velocity.y = dy;
+          this.acceleration.x = dx * heartSettings.particles.effect;
+          this.acceleration.y = dy * heartSettings.particles.effect;
+          this.age = 0;
+        };
+        Particle.prototype.update = function (deltaTime) {
+          this.position.x += this.velocity.x * deltaTime;
+          this.position.y += this.velocity.y * deltaTime;
+          this.velocity.x += this.acceleration.x * deltaTime;
+          this.velocity.y += this.acceleration.y * deltaTime;
+          this.age += deltaTime;
+        };
+        Particle.prototype.draw = function (
+          context,
+          image,
+          currentScaleFactor
+        ) {
+          function ease(t) {
+            return --t * t * t + 1;
+          }
+          var ageFactor = Math.max(
+            0,
+            1 - this.age / heartSettings.particles.duration
+          );
+          var scaledBaseParticleSize = image.width * currentScaleFactor; // Escalar el tamaño base de la partícula
+          var size = scaledBaseParticleSize * ease(ageFactor);
+          context.globalAlpha = Math.max(
+            0,
+            1 - this.age / heartSettings.particles.duration
+          );
+          if (size > 0.1) {
+            // Solo dibujar si el tamaño es visible
+            context.drawImage(
+              image,
+              this.position.x - size / 2,
+              this.position.y - size / 2,
+              size,
+              size
+            );
+          }
+        };
+        return Particle;
+      })();
+
+      var ParticlePool = (function () {
+        var particles,
+          firstActive = 0,
+          firstFree = 0,
+          duration = heartSettings.particles.duration;
+        function ParticlePool(length) {
+          particles = new Array(length);
+          for (var i = 0; i < particles.length; i++)
+            particles[i] = new Particle();
+        }
+        ParticlePool.prototype.add = function (x, y, dx, dy) {
+          particles[firstFree].initialize(x, y, dx, dy);
+          firstFree++;
+          if (firstFree == particles.length) firstFree = 0;
+          if (firstActive == firstFree) firstActive++;
+          if (firstActive == particles.length) firstActive = 0;
+        };
+        ParticlePool.prototype.update = function (deltaTime) {
+          var i;
+          if (firstActive < firstFree) {
+            for (i = firstActive; i < firstFree; i++)
+              particles[i].update(deltaTime);
+          }
+          if (firstFree < firstActive) {
+            for (i = firstActive; i < particles.length; i++)
+              particles[i].update(deltaTime);
+            for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
+          }
+          while (
+            particles[firstActive].age >= duration &&
+            firstActive != firstFree
+          ) {
+            firstActive++;
+            if (firstActive == particles.length) firstActive = 0;
+          }
+        };
+        ParticlePool.prototype.draw = function (
+          context,
+          image,
+          currentScaleFactor
+        ) {
+          var i;
+          if (firstActive < firstFree) {
+            for (i = firstActive; i < firstFree; i++)
+              particles[i].draw(context, image, currentScaleFactor);
+          }
+          if (firstFree < firstActive) {
+            for (i = firstActive; i < particles.length; i++)
+              particles[i].draw(context, image, currentScaleFactor);
+            for (i = 0; i < firstFree; i++)
+              particles[i].draw(context, image, currentScaleFactor);
+          }
+        };
+        return ParticlePool;
+      })();
+
+      (function (canvas) {
+        // Heart Animation IIFE
+        if (!canvas) {
+          console.error("El canvas del corazón no fue encontrado.");
+          return;
+        }
+        var context = canvas.getContext("2d");
+        if (!context) {
+          console.error(
+            "No se pudo obtener el contexto 2D para el canvas del corazón."
+          );
+          return;
+        }
+
+        var particles = new ParticlePool(heartSettings.particles.length);
+        var particleRate =
+          heartSettings.particles.length / heartSettings.particles.duration;
+        var time;
+
+        function pointOnHeart(t) {
+          return new Point(
+            160 * Math.pow(Math.sin(t), 3),
+            130 * Math.cos(t) -
+              50 * Math.cos(2 * t) -
+              20 * Math.cos(3 * t) -
+              10 * Math.cos(4 * t) +
+              25
+          );
+        }
+
+        var image = (function () {
+          var imgCanvas = document.createElement("canvas"),
+            imgContext = imgCanvas.getContext("2d");
+          imgCanvas.width = heartSettings.particles.size;
+          imgCanvas.height = heartSettings.particles.size;
+          function to(t) {
+            var point = pointOnHeart(t);
+            point.x =
+              heartSettings.particles.size / 2 +
+              (point.x * heartSettings.particles.size) / 350;
+            point.y =
+              heartSettings.particles.size / 2 -
+              (point.y * heartSettings.particles.size) / 350;
+            return point;
+          }
+          imgContext.beginPath();
+          var t = -Math.PI;
+          var currentPoint = to(t);
+          imgContext.moveTo(currentPoint.x, currentPoint.y);
+          while (t < Math.PI) {
+            t += 0.01;
+            currentPoint = to(t);
+            imgContext.lineTo(currentPoint.x, currentPoint.y);
+          }
+          imgContext.closePath();
+          imgContext.fillStyle = "#e91e63";
+          imgContext.fill();
+          var image = new Image();
+          image.src = imgCanvas.toDataURL();
+          return image;
+        })();
+
+        function renderHeart() {
+          requestAnimationFrame(renderHeart);
+          var newTime = new Date().getTime() / 1000,
+            deltaTime = newTime - (time || newTime);
+          time = newTime;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          const referenceWidth = 500; // Ancho de referencia (CSS max-width de heart-canvas-container)
+          let scaleFactor = canvas.width / referenceWidth;
+          scaleFactor = Math.min(1.0, scaleFactor); // No escalar más grande que el original
+          scaleFactor = Math.max(0.4, scaleFactor); // Escala mínima para pantallas muy pequeñas
+
+          var amount = particleRate * deltaTime;
+          for (var i = 0; i < amount; i++) {
+            var posUnscaled = pointOnHeart(
+              Math.PI - 2 * Math.PI * Math.random()
+            );
+            var scaledX = posUnscaled.x * scaleFactor;
+            var scaledY = posUnscaled.y * scaleFactor;
+            var dir = posUnscaled
+              .clone()
+              .normalize()
+              .length(heartSettings.particles.velocity);
+            var scaledDirX = dir.x * scaleFactor; // Escalar también la velocidad
+            var scaledDirY = dir.y * scaleFactor;
+            particles.add(
+              canvas.width / 2 + scaledX,
+              canvas.height / 2 - scaledY,
+              scaledDirX,
+              -scaledDirY
+            );
+          }
+          particles.update(deltaTime);
+          particles.draw(context, image, scaleFactor); // Pasar scaleFactor para dibujar partículas
+        }
+
+        function onResizeHeart() {
+          const container = document.getElementById("heart-canvas-container");
+          if (container) {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+          } else {
+            canvas.width = Math.min(window.innerWidth * 0.8, 500);
+            canvas.height = 450;
+          }
+        }
+        window.addEventListener("resize", onResizeHeart);
+        setTimeout(function () {
+          onResizeHeart();
+          renderHeart();
+        }, 100);
+      })(heartCanvas);
 
       // --- Script para el efecto de tecleo (Typewriter) ---
       (function ($) {
-        $.fn.typewriter = function () {
+        $.fn.typewriter = function (callback) {
+          // Añadir parámetro callback
           this.each(function () {
             var d = $(this),
               c = d.html(),
               b = 0;
-            d.html("");
+            d.html(""); // Limpiar contenido para empezar a teclear
             var e = setInterval(function () {
               var f = c.substr(b, 1);
               if (f == "<") {
@@ -591,7 +865,10 @@
               d.html(c.substring(0, b) + (b & 1 ? "_" : ""));
               if (b >= c.length) {
                 clearInterval(e);
-                d.html(c.substring(0, b));
+                d.html(c.substring(0, b)); // Mostrar texto final sin cursor
+                if (typeof callback === "function") {
+                  callback(); // Llamar al callback cuando termine
+                }
               }
             }, 100);
           });
@@ -600,7 +877,6 @@
       })(jQuery);
 
       $(document).ready(function () {
-        // Contenido para el efecto de tecleo
         const codeContent = `
 <span class="comments">// Para Geraldine, la inspiración de mi código y mi vida.</span>
 <span class="keyword">const</span> <span class="variable">miAmorPorTi</span> <span class="operator">=</span> {
@@ -615,25 +891,29 @@
     <span class="keyword">return</span> \`<span class="value">Geraldine, eres mi todo. ¡Te Amo!</span>\`;
   }
 };
-
 <span class="comments">// Cada día, este sentimiento crece más y más.</span>
 <span class="keyword">function</span> <span class="function">nuestroFuturo</span>(<span class="variable">tiempo</span>) {
   <span class="keyword">if</span> (<span class="variable">tiempo</span> <span class="operator">===</span> <span class="value">"siempre"</span>) {
     <span class="keyword">return</span> <span class="value">"Felicidad Eterna Juntos 💖"</span>;
   }
 }
-
 <span class="comments">// console.log(miAmorPorTi.declaracion());</span>
-<span class="comments">// console.log(nuestroFuturo("siempre"));</span>
-            `;
+<span class="comments">// console.log(nuestroFuturo("siempre"));</span>`;
+
+        // Ocultar el botón inicialmente
+        $("#revealLoveButton").hide();
 
         setTimeout(function () {
           if ($("#typed-code-container").length) {
-            $("#typed-code-container").html(codeContent).typewriter();
+            $("#typed-code-container")
+              .html(codeContent)
+              .typewriter(function () {
+                // Callback: se ejecuta cuando el typewriter termina
+                $("#revealLoveButton").fadeIn(1000); // Mostrar el botón con un fade
+              });
           }
         }, 1500);
 
-        // --- Interacción del botón para revelar mensaje ---
         $("#revealLoveButton").click(function () {
           const specialMessage = $("#specialMessage");
           if (specialMessage.length) {
